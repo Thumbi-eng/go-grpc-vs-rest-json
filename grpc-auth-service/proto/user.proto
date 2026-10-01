@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "grpc-auth-service/proto/pb";
+
+// Core User entity returned across services
+message User {
+  string id = 1;
+  string username = 2;
+  string email = 3;
+  string created_at = 4;
+}
+
+// Request to fetch a single user by ID
+message GetUserRequest {
+  string id = 1;
+}
+
+// Request to fetch the currently authenticated user (derived from JWT token in gRPC metadata)
+message GetCurrentUserRequest {}
+
+// Request to list users with optional pagination
+message ListUsersRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+// Response containing a list of users and total count
+message ListUsersResponse {
+  repeated User users = 1;
+  int32 total = 2;
+}
+
+// Request to update a user's details (fields are optional to support partial updates)
+message UpdateUserRequest {
+  string id = 1;
+  optional string username = 2;
+  optional string email = 3;
+  optional string password = 4;
+}
+
+// Request to delete a user by ID
+message DeleteUserRequest {
+  string id = 1;
+}
+
+// Response confirming user deletion
+message DeleteUserResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Response wrapping a single user
+message UserResponse {
+  User user = 1;
+}
+
+// UserService defines User CRUD operations
+service UserService {
+  rpc GetUser(GetUserRequest) returns (UserResponse);
+  rpc GetCurrentUser(GetCurrentUserRequest) returns (UserResponse);
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse);
+  rpc UpdateUser(UpdateUserRequest) returns (UserResponse);
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse);
+}
